@@ -1,18 +1,33 @@
-Easy "clone and go" repository for a libopencm3 based project.
+# Project build
 
-# Instructions
- 1. git clone --recurse-submodules https://github.com/libopencm3/libopencm3-template.git your-project
- 2. cd your-project
- 3. make -C libopencm3 # (Only needed once)
- 4. make -C my-project
-
-If you have an older git, or got ahead of yourself and skipped the ```--recurse-submodules```
-you can fix things by running ```git submodule update --init``` (This is only needed once)
+1. cd core
+2. make leds-dices
+3. ./flash
 
 # Directories
-* my-project contains your application
-* my-common-code contains something shared.
 
-# As a template
-You should replace this with your _own_ README if you are using this
-as a template.
+* core - main application file and its header.
+* common - core files for device elements or used protocols (with their headers)
+
+# Application Testing
+
+## device usage as USB-midi:
+
+To list midi devices, which should include this demo device
+```
+    $ amidi -l
+    Dir Device    Name
+    IO  hw:2,0,0  MIDI demo MIDI 1
+    $
+```
+To record events, while pushing the user button
+```
+    $ amidi -d -p hw:2,0,0
+
+    90 3C 40   -- key down
+    80 3C 40   -- key up
+    90 3C 40
+    80 3C 40^C
+    12 bytes read
+    $s
+```

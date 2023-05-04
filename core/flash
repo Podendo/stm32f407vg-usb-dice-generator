@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "building project..."
+
+make led_dices.bin
+
+echo "flashing binary file to target..."
+st-flash --reset --format binary write led_dices.bin 0x08000000
