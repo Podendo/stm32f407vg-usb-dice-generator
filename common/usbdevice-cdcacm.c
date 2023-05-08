@@ -169,6 +169,18 @@ enum usbd_request_return_codes cons_control_request(usbd_device *usbd_dev,
 
 	switch (req->bRequest) {
 		case USB_CDC_REQ_SET_CONTROL_LINE_STATE: {
+			char local_buf[10];
+			struct usb_cdc_notification *notif = (void *)local_buf;
+			/* echo signals back to host as notification */
+			notif->bmRequestType = 0xA1;
+			notif->bNotification = USB_CDC_NOTIFY_SERIAL_STATE;
+			notif->wValue = 0;
+			notif->wIndex = 0;
+			notif->wLength = 2;
+			local_buf[8] = req->wValue & 3;
+			local_buf[9] = 0;
+			usbd_ep_write_packet(usbd_dev, 0x82, local_buf, 10);
+
 			return USBD_REQ_HANDLED;
 		}
 		case USB_CDC_REQ_SET_LINE_CODING: {
@@ -183,7 +195,7 @@ enum usbd_request_return_codes cons_control_request(usbd_device *usbd_dev,
 		}
 	}
 
-	return USBD_REQ_HANDLED;
+	return USBD_REQ_NOTSUPP;
 }
 
 void cons_data_rx_cb(usbd_device *usbd_dev, uint8_t endpoint)
@@ -258,6 +270,3 @@ void cons_set_device_usb_cdcacm(struct usbcdcacm *usb_console)
 
 	return;
 }
-
-
-/* EOF */

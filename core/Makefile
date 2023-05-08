@@ -4,6 +4,7 @@ BUILD_DIR = bin
 SHARED_DIR = ../common
 CFILES = main.c
 
+CFILES += ad7608adc.c
 CFILES += dicethrow.c
 CFILES += usbdevice.c
 CFILES += usbdevice-cdcacm.c

@@ -12,6 +12,7 @@
 #include "main.h"
 #include "dicethrow.h"
 
+/* TODO - setup SPI, write send-receive commands for 1-byte, check via LA */
 
 /* message for UART-TTY debugging: */
 static const char *mesg = "hello to console!\0";
@@ -50,14 +51,14 @@ int main(void)
 	while (1) {
 		usbd_poll(mydevice.cons_usb.usbd_dev);
 
-		/* device_dice_btn(GPIOA, GPIO0, mydevice.midi_usb.usbd_dev); */
+		device_dice_btn(GPIOA, GPIO0, mydevice.cons_usb.usbd_dev);
 	}
 	/* program never reaches this point */
 
 	return 0;
 }
 
-void device_sleep_ms(uint32_t delay_ms)
+extern void device_sleep_ms(uint32_t delay_ms)
 {
 	uint32_t current_ms = systick_ms;
 	while ( (systick_ms - current_ms) < delay_ms ) {
@@ -226,7 +227,11 @@ void device_dice_btn(uint32_t gpioport, uint16_t gpiopin, usbd_device *usbd_dev)
 
 		while ( seed ) {
 			device_send_serial(USART2, (uint8_t *)&seed, 1);
-			usbmidi_send_event(usbd_dev, !!btn_state);
+			/* usbmidi_send_event(usbd_dev, !!btn_state); */
+
+			while (usbd_ep_write_packet(usbd_dev, 0x82,
+					(uint8_t *)&seed, 1) == 0);
+
 			device_led_blinking();
 			seed = seed - 1;
 		}
@@ -242,23 +247,17 @@ void device_dice_btn(uint32_t gpioport, uint16_t gpiopin, usbd_device *usbd_dev)
 
 void device_led_blinking(void)
 {
-	gpio_set(GPIOD, GPIO12);
-	device_sleep_ms(625);
-	gpio_set(GPIOD, GPIO13);
-	device_sleep_ms(625);
-	gpio_set(GPIOD, GPIO14);
-	device_sleep_ms(625);
-	gpio_set(GPIOD, GPIO15);
-	device_sleep_ms(625);
+	int pins = 0;
 
-	gpio_clear(GPIOD, GPIO12);
-	device_sleep_ms(625);
-	gpio_clear(GPIOD, GPIO13);
-	device_sleep_ms(625);
-	gpio_clear(GPIOD, GPIO14);
-	device_sleep_ms(625);
-	gpio_clear(GPIOD, GPIO15);
-	device_sleep_ms(625);
+	for (pins = 0; pins < 4; ++pins) {
+		gpio_set(GPIOD, GPIO11 << (pins + 1));
+		device_sleep_ms(625);
+	}
+
+	for (pins = 0; pins < 4; ++pins) {
+		gpio_clear(GPIOD, GPIO11 << (pins + 1));
+		device_sleep_ms(625);
+	}
 
 	return;
 }

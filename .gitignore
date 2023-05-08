@@ -4,3 +4,4 @@ bin/
 generated.*.ld
 commit
 .vscode/
+.vscode/settings.json

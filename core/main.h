@@ -4,6 +4,7 @@
 #include "usbdevice-cdcacm.h"
 #include "usbdevice.h"
 #include "dicethrow.h"
+#include "ad7608adc.h"
 
 
 
@@ -12,29 +13,30 @@
 
 
 struct joysticks {
-	uint32_t adc_chan_vrx;
-	uint32_t adc_chan_vry;
-	uint32_t btn_sw;
+	uint32_t		adc_chan_vrx;	/* X-axis measurement */
+	uint32_t		adc_chan_vry;	/* Y-axis measurement */
+	uint32_t		btn_sw;		/* push-button switch */
 };
 
 struct boardleds {
-	uint32_t ledport;
-	uint16_t ledgpio;
-	uint8_t  lednumb;
+	uint32_t		ledport;	/* GPIO ports for on-board leds */
+	uint16_t		ledgpio;	/* GPIO pin for on-board leds */
+	uint8_t			lednumb;	/* number of onboard gpios */
 };
 
 struct device {
-	struct usbgadget	midi_usb;
-	struct usbcdcacm	cons_usb;
-	struct joysticks	joystick;
-	struct boardleds	ledsrect;
+	struct usbgadget	midi_usb;	/* usb midi specification */
+	struct usbcdcacm	cons_usb;	/* usb cdc-acm specification */
+	struct joysticks	joystick;	/* analogue joystick periph */
+	struct boardleds	ledsrect;	/* on-board leds structure */
+	struct ad7608adc	ad7608_8;	/* 8-channel parallel ADC */
 };
 
 /*
  * @brief device goes to sleep for some amount of time
  * @param delay_ms - value in millis, how long device will sleep;
  */
-void device_sleep_ms(uint32_t delay_ms);
+extern void device_sleep_ms(uint32_t delay_ms);
 
 /*
  * @brief setup system clocks for peripherals

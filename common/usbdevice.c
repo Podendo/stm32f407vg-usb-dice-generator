@@ -29,8 +29,8 @@ static char usb_serial_number[25];
 
 /* sending messages via usb array of strings: */
 static const char * usb_strings[] = {
-	"libopencm3.org",
-	"MIDI demo",
+	"oleksii Nedopytalskyi AVKS-12",
+	"MIDI USB device",
 	usb_serial_number
 };
 
